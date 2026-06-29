@@ -38,7 +38,7 @@ app.put("/api/tasks/:id", async (req, res) => {
   const { success, data, error } = validateTaskPartial(req.body);
 
   if (error)
-    return res.status(500).json({ message: JSON.parse(error.message) });
+    return res.status(400).json({ message: JSON.parse(error.message) });
 
   const task = await tasks.findByIdAndUpdate(id, data);
 
