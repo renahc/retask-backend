@@ -20,6 +20,18 @@ app.get("/api/tasks", async (req, res) => {
   return res.status(200).json(task);
 });
 
+// CREATE TASK
+app.post("/api/tasks", async (req, res) => {
+  const { success, data, error } = validateTask(req.body);
+
+  if (error)
+    return res.status(500).json({ message: JSON.parse(error.message) });
+
+  const create = await tasks.create(data);
+
+  res.status(201).json(create);
+});
+
 app.listen(PORT, () => {
   console.log(`server listening on port http://localhost:${PORT}`);
 });
