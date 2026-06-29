@@ -9,3 +9,7 @@ export const TaskScheme = z.object({
 export const validateTask = (input) => {
   return TaskScheme.safeParse(input);
 };
+
+export const validateTaskPartial = (input) => {
+  return TaskScheme.partial().safeParse(input);
+};
