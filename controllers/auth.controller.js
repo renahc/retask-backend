@@ -1,7 +1,6 @@
 import { AuthModel } from "../models/auth.model.js";
 import { validateRegister, validateLogin } from "../schemas/auth.schema.js";
 import bcrypt from "bcrypt";
-import { SALT_ROUNDS } from "../config.js";
 import jwt from "jsonwebtoken";
 export class AuthController {
   static register = async (req, res) => {
@@ -11,7 +10,7 @@ export class AuthController {
       if (error)
         return res.status(400).json({ message: JSON.parse(error.message) });
 
-      const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
+      const hashedPassword = await bcrypt.hash(data.password, 10);
 
       const userToSave = {
         ...data,
@@ -41,6 +40,13 @@ export class AuthController {
         return res.status(400).json({ message: JSON.parse(error.message) });
 
       const user = await AuthModel.login({ data });
+
+      const isPasswordValid = user
+        ? await bcrypt.compare(data.password, user.password)
+        : false;
+
+      if (!isPasswordValid)
+        return res.status(401).json({ message: "Invalid email or password" });
 
       if (!user)
         return res.status(401).json({ message: "Invalid email or password" });

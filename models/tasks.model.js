@@ -10,16 +10,14 @@ export class TaskModel {
   };
 
   static update = async ({ id, data }) => {
-    const task = await tasks.findByIdAndUpdate(id, data);
-
-    if (!task) return null;
-
-    return task;
+    return await tasks.findByIdAndUpdate(id, data);
   };
 
-  static delete = async ({ id }) => {
-    const taskDeleted = await tasks.findByIdAndDelete(id);
-    if (!taskDeleted) return null;
-    return taskDeleted;
+  static delete = async ({ id, userId }) => {
+    return await tasks.findByIdAndDelete(id);
+  };
+
+  static findById = async ({ id }) => {
+    return await tasks.findById(id);
   };
 }
