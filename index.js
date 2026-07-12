@@ -7,12 +7,14 @@ import { corsMiddleware } from "./middlewares/cors.middleware.js";
 import { PORT } from "./config.js";
 import { taskRouter } from "./routes/tasks.routes.js";
 import { authRouter } from "./routes/auth.routes.js";
+import cookieParser from "cookie-parser";
 
 connectDB();
 
 const app = express();
 app.use(express.json());
 app.use(corsMiddleware());
+app.use(cookieParser());
 app.use(morgan("dev"));
 
 app.use("/api/tasks", taskRouter);

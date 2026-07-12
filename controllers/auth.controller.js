@@ -1,23 +1,23 @@
 import { AuthModel } from "../models/auth.model.js";
-import { validateRegister, validateLogin } from "../schemas/auth.schema.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 export class AuthController {
   static register = async (req, res) => {
     try {
-      const { data, error } = validateRegister(req.body);
+      const { username, email, password } = req.body;
 
-      if (error)
-        return res.status(400).json({ message: JSON.parse(error.message) });
-
-      const hashedPassword = await bcrypt.hash(data.password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       const userToSave = {
-        ...data,
+        username,
+        email,
         password: hashedPassword,
       };
 
       const userCreated = await AuthModel.register({ data: userToSave });
+
+      if (!userCreated)
+        return res.status(400).json(["The email already exists"]);
 
       res.status(201).json({
         message: "User created successfully",
@@ -28,31 +28,27 @@ export class AuthController {
         },
       });
     } catch (e) {
-      res.status(500).json({ message: e.message });
+      res.status(500).json([e.message]);
     }
   };
 
   static login = async (req, res) => {
     try {
-      const { data, error } = validateLogin(req.body);
+      const { email, password } = req.body;
 
-      if (error)
-        return res.status(400).json({ message: JSON.parse(error.message) });
-
-      const user = await AuthModel.login({ data });
-
+      const user = await AuthModel.login({ email, password });
+      console.log(user);
       const isPasswordValid = user
-        ? await bcrypt.compare(data.password, user.password)
+        ? await bcrypt.compare(password, user.password)
         : false;
 
       if (!isPasswordValid)
-        return res.status(401).json({ message: "Invalid email or password" });
+        return res.status(401).json(["Invalid email or password"]);
 
-      if (!user)
-        return res.status(401).json({ message: "Invalid email or password" });
+      if (!user) return res.status(401).json(["Invalid email or password"]);
 
       const token = jwt.sign(
-        { id: user._id, email: user.email },
+        { id: user._id, username: user.username, email: user.email },
         process.env.JWT_SECRET,
         { expiresIn: "1h" },
       );
@@ -73,8 +69,19 @@ export class AuthController {
           email: user.email,
         },
       });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+    } catch (e) {
+      res.status(500).json([e.message]);
     }
+  };
+
+  static me = (req, res) => {
+    res.status(200).json({
+      authenticated: true,
+      user: {
+        id: req.user.id,
+        username: req.user.username,
+        email: req.user.email,
+      },
+    });
   };
 }

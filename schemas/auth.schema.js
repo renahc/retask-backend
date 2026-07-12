@@ -1,20 +1,25 @@
 import { z } from "zod";
 
 export const RegisterSchema = z.object({
-  username: z.string(),
-  email: z.string().email(),
-  password: z.string(),
+  username: z
+    .string("Username must be a text")
+    .trim()
+    .min(1, "Username is required"),
+  email: z
+    .string("Email must be a text")
+    .trim()
+    .min(1, "Email is required")
+    .email("Invalid email"),
+  password: z
+    .string("Password must be a text")
+    .min(6, "Password must be a least 6 characters"),
 });
 
 export const LoginSchema = z.object({
-  email: z.string().email(),
-  password: z.string(),
+  email: z
+    .string("Email must be a text")
+    .trim()
+    .min(1, "Email is required")
+    .email("Invalid email"),
+  password: z.string("Password must be a text").min(1, "Password is required"),
 });
-
-export const validateRegister = (input) => {
-  return RegisterSchema.safeParse(input);
-};
-
-export const validateLogin = (input) => {
-  return LoginSchema.safeParse(input);
-};
