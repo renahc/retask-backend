@@ -14,3 +14,4 @@ authRouter.post(
 
 authRouter.post("/login", validateSchema(LoginSchema), AuthController.login);
 authRouter.get("/me", authMiddleware, AuthController.me);
+authRouter.post("/logout", authMiddleware, AuthController.logout);

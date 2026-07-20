@@ -2,7 +2,9 @@ import tasks from "../db/tasks.js";
 
 export class TaskModel {
   static getAll = async ({ userId }) => {
-    return await tasks.find({ userId });
+    const task = await tasks.find({ userId });
+
+    return task;
   };
 
   static create = async ({ data }) => {

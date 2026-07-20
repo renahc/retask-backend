@@ -5,6 +5,7 @@ export class TaskController {
   static getAll = async (req, res) => {
     try {
       const tasks = await TaskModel.getAll({ userId: req.user.id });
+
       return res.status(200).json(tasks);
     } catch (e) {
       res.status(500).json({ message: e.message });

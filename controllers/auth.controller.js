@@ -37,7 +37,6 @@ export class AuthController {
       const { email, password } = req.body;
 
       const user = await AuthModel.login({ email, password });
-      console.log(user);
       const isPasswordValid = user
         ? await bcrypt.compare(password, user.password)
         : false;
@@ -72,6 +71,20 @@ export class AuthController {
     } catch (e) {
       res.status(500).json([e.message]);
     }
+  };
+
+  static logout = (req, res) => {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Sesión cerrada correctamente",
+    });
   };
 
   static me = (req, res) => {
